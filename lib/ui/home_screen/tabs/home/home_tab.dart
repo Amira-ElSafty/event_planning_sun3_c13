@@ -103,6 +103,9 @@ class _HomeTabState extends State<HomeTab> {
                         ),
                         tabs: eventsNameList.map((eventName){
                           return TabEventWidget(
+                            backgroundColor: AppColors.whiteColor,
+                              textSelectedStyle: AppStyles.medium16Primary,
+                              textUnSelectedStyle: AppStyles.medium16White,
                               isSelected: selectedIndex == eventsNameList.indexOf(eventName),
                               eventName: eventName);
                         }).toList()

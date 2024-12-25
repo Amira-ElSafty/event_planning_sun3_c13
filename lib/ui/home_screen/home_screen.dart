@@ -1,4 +1,5 @@
 import 'package:event_planning_c13_sun3/ui/home_screen/tabs/favorite/favorite_tab.dart';
+import 'package:event_planning_c13_sun3/ui/home_screen/tabs/home/add_event/add_event.dart';
 import 'package:event_planning_c13_sun3/ui/home_screen/tabs/home/home_tab.dart';
 import 'package:event_planning_c13_sun3/ui/home_screen/tabs/map/map_tab.dart';
 import 'package:event_planning_c13_sun3/ui/home_screen/tabs/profile/profile_tab.dart';
@@ -63,6 +64,7 @@ class _HomeScreenState extends State<HomeScreen> {
       floatingActionButton: FloatingActionButton(
         onPressed: () {
           // navigate to add event screen
+          Navigator.of(context).pushNamed(AddEvent.routeName);
         },
         child: Icon(
           Icons.add,

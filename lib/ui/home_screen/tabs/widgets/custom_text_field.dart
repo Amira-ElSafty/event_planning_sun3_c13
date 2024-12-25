@@ -2,6 +2,8 @@ import '../../../../utils/app_colors.dart';
 import '../../../../utils/app_styles.dart';
 import 'package:flutter/material.dart';
 
+typedef MyValidator = String? Function(String?)? ;
+
 class CustomTextField extends StatelessWidget {
   Color? borderColor ;
   String? hintText ;
@@ -11,14 +13,21 @@ class CustomTextField extends StatelessWidget {
   Widget? prefixIcon ;
   Widget? suffixIcon ;
   bool obscureText ;
+  int? maxLines ;
+  MyValidator validator ;
+  TextEditingController? controller ;
 
   CustomTextField({this.borderColor,this.hintText,this.labelText,
-  this.hintStyle,this.labelStyle,this.suffixIcon,
-    this.prefixIcon, this.obscureText = false});
+  this.hintStyle,this.labelStyle,this.suffixIcon,this.maxLines,
+    this.controller,
+    this.prefixIcon, this.obscureText = false,this.validator});
 
   @override
   Widget build(BuildContext context) {
     return TextFormField(
+      controller: controller,
+      validator: validator,
+      maxLines: maxLines,
       obscureText: obscureText,
       obscuringCharacter: '*',
       decoration: InputDecoration(
