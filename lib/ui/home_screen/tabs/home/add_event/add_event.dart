@@ -1,3 +1,6 @@
+import 'package:event_planning_c13_sun3/firebase_utils.dart';
+import 'package:event_planning_c13_sun3/model/event.dart';
+import 'package:event_planning_c13_sun3/providers/event_list_provider.dart';
 import 'package:event_planning_c13_sun3/ui/home_screen/tabs/home/tab_event_widget.dart';
 import 'package:event_planning_c13_sun3/ui/home_screen/tabs/widgets/choose_date_or_time.dart';
 import 'package:event_planning_c13_sun3/ui/home_screen/tabs/widgets/custom_elevated_button.dart';
@@ -8,6 +11,7 @@ import 'package:event_planning_c13_sun3/utils/assets_manager.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:intl/intl.dart';
+import 'package:provider/provider.dart';
 class AddEvent extends StatefulWidget {
   static const String routeName = 'add_event';
 
@@ -27,9 +31,11 @@ class _AddEventState extends State<AddEvent> {
   String? formatedTime ;     /// =>
   String selectedImage = '';   /// image
   String selectedEventName = '';   /// event name
+  late EventListProvider eventListProvider ;
 
   @override
   Widget build(BuildContext context) {
+     eventListProvider = Provider.of<EventListProvider>(context);
     var width = MediaQuery.of(context).size.width;
     var height = MediaQuery.of(context).size.height;
     List<String> eventsNameList = [
@@ -67,8 +73,6 @@ class _AddEventState extends State<AddEvent> {
     };
     selectedImage = imageSelectedNameList[selectedIndex];
     selectedEventName = eventsNameList[selectedIndex] ;
-    print('selectedImage : $selectedImage');
-    print('selectedEventName : $selectedEventName');
     return Scaffold(
       appBar: AppBar(
         centerTitle: true,
@@ -161,7 +165,9 @@ class _AddEventState extends State<AddEvent> {
                       iconName: AssetsManager.iconDate,
                       eventDateOrTime: AppLocalizations.of(context)!.event_date,
                       chooseDateOrTime: selectedDate == null ?
-                      AppLocalizations.of(context)!.choose_date:formatedDate
+                      AppLocalizations.of(context)!.choose_date:
+                      DateFormat('dd/MM/yyyy').format(selectedDate!)
+                      // formatedDate
                           // '${selectedDate!.day}/${selectedDate!.month}/'
                           //     '${selectedDate!.year}'
                       , onChooseDateOrTime: chooseDate
@@ -225,13 +231,27 @@ class _AddEventState extends State<AddEvent> {
       ),
     );
   }
+
   void addEvent(){
 
     if(formKey.currentState?.validate() == true){
-      if(selectedDate == null || selectedTime == null ){
-
-      }
       //todo: add event
+      Event event = Event(
+          title: titleController.text,
+          description: descriptionController.text,
+          image: selectedImage,
+          eventName: selectedEventName,
+          dateTime: selectedDate!,
+          time: formatedTime!
+      );
+      FirebaseUtils.addEventToFireStore(event).timeout(
+          Duration(milliseconds: 500),onTimeout: (){
+            //todo: alert dialog , snack bar , toast
+            print('event added successfully');
+            //todo: refresh events list
+            eventListProvider.getAllEvents();
+            Navigator.pop(context);
+      });
     }
 
   }
@@ -244,7 +264,7 @@ class _AddEventState extends State<AddEvent> {
     );
    selectedDate = chooseDate ;
    // selectedDate = DateFormat('dd/MM/yyyy').format(chooseDate!);
-   formatedDate = DateFormat('dd/MM/yyyy').format(selectedDate!);
+   formatedDate = DateFormat('dd/MMM/yyyy').format(selectedDate!);
    setState(() {
 
    });

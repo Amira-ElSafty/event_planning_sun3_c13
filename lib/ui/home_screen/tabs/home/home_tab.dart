@@ -1,6 +1,11 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:event_planning_c13_sun3/firebase_utils.dart';
+import 'package:event_planning_c13_sun3/providers/event_list_provider.dart';
 import 'package:event_planning_c13_sun3/ui/home_screen/tabs/home/tab_event_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:provider/provider.dart';
+import '../../../../model/event.dart';
 import '../../../../utils/app_colors.dart';
 import '../../../../utils/app_styles.dart';
 import '../../../../utils/assets_manager.dart';
@@ -11,24 +16,18 @@ class HomeTab extends StatefulWidget {
 }
 
 class _HomeTabState extends State<HomeTab> {
-  int selectedIndex = 0 ;
+  late EventListProvider eventListProvider ;
 
   @override
   Widget build(BuildContext context) {
+     eventListProvider = Provider.of<EventListProvider>(context);
+     eventListProvider.getEventsNameList(context);
+     if(eventListProvider.eventsList.isEmpty) {
+      eventListProvider.getAllEvents();
+    }
     var height = MediaQuery.of(context).size.height ;
     var width = MediaQuery.of(context).size.width ;
-    List<String> eventsNameList = [
-      AppLocalizations.of(context)!.all,
-      AppLocalizations.of(context)!.sport,
-      AppLocalizations.of(context)!.birthday,
-      AppLocalizations.of(context)!.meeting,
-      AppLocalizations.of(context)!.gaming,
-      AppLocalizations.of(context)!.workshop,
-      AppLocalizations.of(context)!.book_club,
-      AppLocalizations.of(context)!.exhibition,
-      AppLocalizations.of(context)!.holiday,
-      AppLocalizations.of(context)!.eating,
-    ];
+
     return Scaffold(
       appBar: AppBar(
         backgroundColor: AppColors.primaryLight,
@@ -85,13 +84,10 @@ class _HomeTabState extends State<HomeTab> {
                   ],
                 ),
                 DefaultTabController(
-                    length: eventsNameList.length,
+                    length: eventListProvider.eventsNameList.length,
                     child: TabBar(
                       onTap: (index){
-                        selectedIndex = index ;
-                        setState(() {
-
-                        });
+                        eventListProvider.changeSelectedIndex(index);
                       },
                       isScrollable: true,
                         indicatorColor: AppColors.transparentColor,
@@ -101,12 +97,13 @@ class _HomeTabState extends State<HomeTab> {
                           horizontal: width*0.02,
                           vertical: height*0.01
                         ),
-                        tabs: eventsNameList.map((eventName){
+                        tabs: eventListProvider.eventsNameList.map((eventName){
                           return TabEventWidget(
                             backgroundColor: AppColors.whiteColor,
                               textSelectedStyle: AppStyles.medium16Primary,
                               textUnSelectedStyle: AppStyles.medium16White,
-                              isSelected: selectedIndex == eventsNameList.indexOf(eventName),
+                              isSelected: eventListProvider.selectedIndex ==
+                                  eventListProvider.eventsNameList.indexOf(eventName),
                               eventName: eventName);
                         }).toList()
                     )
@@ -119,16 +116,19 @@ class _HomeTabState extends State<HomeTab> {
               vertical: height*0.02,
               horizontal: width * 0.04
             ),
-            child: ListView.separated(
+            child: eventListProvider.filterEventsList.isEmpty ?
+                Center(child: Text('No Items Found'),)
+                :
+            ListView.separated(
               separatorBuilder: (context,index){
                 return SizedBox(
                   height: height*0.02,
                 );
               },
               itemBuilder: (context,index){
-              return EventItemWidget();
+              return EventItemWidget(event: eventListProvider.filterEventsList[index],);
             },
-            itemCount: 20,),
+            itemCount:eventListProvider. filterEventsList.length,),
           ))
         ],
       ),
