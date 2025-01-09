@@ -1,3 +1,6 @@
+import 'package:event_planning_c13_sun3/providers/event_list_provider.dart';
+import 'package:event_planning_c13_sun3/providers/user_provider.dart';
+import 'package:event_planning_c13_sun3/ui/auth/login/login_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:provider/provider.dart';
@@ -23,6 +26,7 @@ class _ProfileTabState extends State<ProfileTab> {
     var width = MediaQuery.of(context).size.width;
     var languageProvider = Provider.of<AppLanguageProvider>(context);
     var themeProvider = Provider.of<AppThemeProvider>(context);
+    var eventListProvider = Provider.of<EventListProvider>(context);
     return Scaffold(
       appBar: AppBar(
         backgroundColor: AppColors.primaryLight,
@@ -143,7 +147,11 @@ class _ProfileTabState extends State<ProfileTab> {
 
                 )
               ),
-                onPressed: (){}, child: Row(
+                onPressed: (){
+                // eventListProvider.filterEventsList = [];
+                // eventListProvider.selectedIndex = 0 ;
+                Navigator.of(context).pushReplacementNamed(LoginScreen.routeName);
+                }, child: Row(
               children: [
                 const Icon(Icons.logout,color: AppColors.whiteColor,),
                 SizedBox(width: width*0.02,),

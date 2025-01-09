@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:event_planning_c13_sun3/firebase_utils.dart';
 import 'package:event_planning_c13_sun3/providers/event_list_provider.dart';
+import 'package:event_planning_c13_sun3/providers/user_provider.dart';
 import 'package:event_planning_c13_sun3/ui/home_screen/tabs/home/tab_event_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
@@ -22,8 +23,9 @@ class _HomeTabState extends State<HomeTab> {
   Widget build(BuildContext context) {
      eventListProvider = Provider.of<EventListProvider>(context);
      eventListProvider.getEventsNameList(context);
+     var userProvider = Provider.of<UserProvider>(context);
      if(eventListProvider.eventsList.isEmpty) {
-      eventListProvider.getAllEvents();
+      eventListProvider.getAllEvents(userProvider.currentUser!.id);
     }
     var height = MediaQuery.of(context).size.height ;
     var width = MediaQuery.of(context).size.width ;
@@ -53,7 +55,7 @@ class _HomeTabState extends State<HomeTab> {
           children: [
             Text(AppLocalizations.of(context)!.welcome_back,
             style: AppStyles.regular14White,),
-            Text('Route Academy',
+            Text(userProvider.currentUser!.name,
             style: AppStyles.bold24White,),
           ],
         ),
@@ -61,7 +63,7 @@ class _HomeTabState extends State<HomeTab> {
       body: Column(
         children: [
           Container(
-            height: height * 0.12,
+            height: height * 0.14,
             padding: EdgeInsets.symmetric(
               horizontal: width*0.04,
               vertical: height*0.01
@@ -87,7 +89,8 @@ class _HomeTabState extends State<HomeTab> {
                     length: eventListProvider.eventsNameList.length,
                     child: TabBar(
                       onTap: (index){
-                        eventListProvider.changeSelectedIndex(index);
+                        eventListProvider.changeSelectedIndex(index,
+                            userProvider.currentUser!.id);
                       },
                       isScrollable: true,
                         indicatorColor: AppColors.transparentColor,
@@ -117,7 +120,7 @@ class _HomeTabState extends State<HomeTab> {
               horizontal: width * 0.04
             ),
             child: eventListProvider.filterEventsList.isEmpty ?
-                Center(child: Text('No Items Found'),)
+                Center(child: Text(AppLocalizations.of(context)!.no_events_found),)
                 :
             ListView.separated(
               separatorBuilder: (context,index){

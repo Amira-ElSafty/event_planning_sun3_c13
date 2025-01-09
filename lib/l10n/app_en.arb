@@ -46,5 +46,16 @@
 "choose_time" : "Choose Time",
 "location" : "Location",
 "choose_event_location" : "Choose Event Location",
-"search_event" : "Search For Event"
+"search_event" : "Search For Event",
+"no_events_found" : "No Events Found Yet",
+"no_favorite_events_found" : "No Favorite Events Found Yet",
+"please_enter_title":"Please enter title",
+"please_enter_description":"Please enter description",
+"please_enter_name":"Please enter Name",
+"please_enter_email":"Please enter Email",
+"please_enter_password":"Please enter Password",
+"please_enter_rePassword":"Please enter Re-Password",
+"please_enter_valid_email":"Please enter valid Email",
+"password_validation":"Password should me at least 6 chars.",
+"re_password_validation":"Re-Password doesn't match Password"
 }

@@ -1,6 +1,7 @@
 import 'package:event_planning_c13_sun3/firebase_utils.dart';
 import 'package:event_planning_c13_sun3/model/event.dart';
 import 'package:event_planning_c13_sun3/providers/event_list_provider.dart';
+import 'package:event_planning_c13_sun3/providers/user_provider.dart';
 import 'package:event_planning_c13_sun3/ui/home_screen/tabs/home/tab_event_widget.dart';
 import 'package:event_planning_c13_sun3/ui/home_screen/tabs/widgets/choose_date_or_time.dart';
 import 'package:event_planning_c13_sun3/ui/home_screen/tabs/widgets/custom_elevated_button.dart';
@@ -8,6 +9,7 @@ import 'package:event_planning_c13_sun3/ui/home_screen/tabs/widgets/custom_text_
 import 'package:event_planning_c13_sun3/utils/app_colors.dart';
 import 'package:event_planning_c13_sun3/utils/app_styles.dart';
 import 'package:event_planning_c13_sun3/utils/assets_manager.dart';
+import 'package:event_planning_c13_sun3/utils/flutter_toast.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:intl/intl.dart';
@@ -32,10 +34,12 @@ class _AddEventState extends State<AddEvent> {
   String selectedImage = '';   /// image
   String selectedEventName = '';   /// event name
   late EventListProvider eventListProvider ;
+  late UserProvider userProvider ;
 
   @override
   Widget build(BuildContext context) {
      eventListProvider = Provider.of<EventListProvider>(context);
+     userProvider = Provider.of<UserProvider>(context);
     var width = MediaQuery.of(context).size.width;
     var height = MediaQuery.of(context).size.height;
     List<String> eventsNameList = [
@@ -60,17 +64,17 @@ class _AddEventState extends State<AddEvent> {
       AssetsManager.holidayImage,
       AssetsManager.eatingImage,
     ];
-    Map<String,String> mapList = {
-      AppLocalizations.of(context)!.sport:AssetsManager.sportImage,
-      AppLocalizations.of(context)!.birthday:AssetsManager.birthdayImage,
-      AppLocalizations.of(context)!.meeting:AssetsManager.meetingImage,
-      AppLocalizations.of(context)!.gaming:AssetsManager.gamingImage,
-      AppLocalizations.of(context)!.workshop:AssetsManager.workshopImage,
-      AppLocalizations.of(context)!.book_club:AssetsManager.bookClubImage,
-      AppLocalizations.of(context)!.exhibition:AssetsManager.exhibitionImage,
-      AppLocalizations.of(context)!.holiday:AssetsManager.holidayImage,
-      AppLocalizations.of(context)!.eating:AssetsManager.eatingImage,
-    };
+    // Map<String,String> mapList = {
+    //   AppLocalizations.of(context)!.sport:AssetsManager.sportImage,
+    //   AppLocalizations.of(context)!.birthday:AssetsManager.birthdayImage,
+    //   AppLocalizations.of(context)!.meeting:AssetsManager.meetingImage,
+    //   AppLocalizations.of(context)!.gaming:AssetsManager.gamingImage,
+    //   AppLocalizations.of(context)!.workshop:AssetsManager.workshopImage,
+    //   AppLocalizations.of(context)!.book_club:AssetsManager.bookClubImage,
+    //   AppLocalizations.of(context)!.exhibition:AssetsManager.exhibitionImage,
+    //   AppLocalizations.of(context)!.holiday:AssetsManager.holidayImage,
+    //   AppLocalizations.of(context)!.eating:AssetsManager.eatingImage,
+    // };
     selectedImage = imageSelectedNameList[selectedIndex];
     selectedEventName = eventsNameList[selectedIndex] ;
     return Scaffold(
@@ -244,12 +248,19 @@ class _AddEventState extends State<AddEvent> {
           dateTime: selectedDate!,
           time: formatedTime!
       );
-      FirebaseUtils.addEventToFireStore(event).timeout(
+      FirebaseUtils.addEventToFireStore(event,userProvider.currentUser!.id)
+          .then((value){
+        //todo: alert dialog , snack bar , toast
+        print('event added successfully');
+        ToastMessage.toastMsg('Event added Successfully.');
+        //todo: refresh events list
+        eventListProvider.getAllEvents(userProvider.currentUser!.id);
+      }).timeout(
           Duration(milliseconds: 500),onTimeout: (){
             //todo: alert dialog , snack bar , toast
             print('event added successfully');
             //todo: refresh events list
-            eventListProvider.getAllEvents();
+            eventListProvider.getAllEvents(userProvider.currentUser!.id);
             Navigator.pop(context);
       });
     }

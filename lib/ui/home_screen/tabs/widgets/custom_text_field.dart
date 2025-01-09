@@ -16,18 +16,21 @@ class CustomTextField extends StatelessWidget {
   int? maxLines ;
   MyValidator validator ;
   TextEditingController? controller ;
+  TextInputType? keyboardType ;
 
   CustomTextField({this.borderColor,this.hintText,this.labelText,
   this.hintStyle,this.labelStyle,this.suffixIcon,this.maxLines,
     this.controller,
+    this.keyboardType = TextInputType.text,
     this.prefixIcon, this.obscureText = false,this.validator});
 
   @override
   Widget build(BuildContext context) {
     return TextFormField(
+      keyboardType: keyboardType,
       controller: controller,
       validator: validator,
-      maxLines: maxLines,
+      maxLines: maxLines ?? 1,
       obscureText: obscureText,
       obscuringCharacter: '*',
       decoration: InputDecoration(

@@ -1,7 +1,9 @@
 import 'package:event_planning_c13_sun3/model/event.dart';
+import 'package:event_planning_c13_sun3/providers/event_list_provider.dart';
+import 'package:event_planning_c13_sun3/providers/user_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-
+import 'package:provider/provider.dart';
 import '../../../../utils/app_colors.dart';
 import '../../../../utils/app_styles.dart';
 import '../../../../utils/assets_manager.dart';
@@ -14,12 +16,10 @@ class EventItemWidget extends StatelessWidget {
   Widget build(BuildContext context) {
     var height = MediaQuery.of(context).size.height ;
     var width = MediaQuery.of(context).size.width ;
+    var eventListProvider = Provider.of<EventListProvider>(context);
+    var userProvider = Provider.of<UserProvider>(context);
     return Container(
       height: height * 0.31,
-      // margin: EdgeInsets.symmetric(
-      //   horizontal: width*0.04,
-      //   vertical: height * 0.01
-      // ),
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(16),
         border: Border.all(
@@ -77,8 +77,18 @@ class EventItemWidget extends StatelessWidget {
                   child: Text(event.title,
                   style: AppStyles.bold14Black,),
                 ),
-                Image.asset(AssetsManager.iconFavorite,
-                color: AppColors.primaryLight,)
+                InkWell(
+                  onTap: (){
+                    //todo: update favorite
+                    eventListProvider.updateFavoriteEvent(event,userProvider.currentUser!.id);
+                  },
+                  child: Image.asset(
+                    event.isFavorite == true ?
+                        AssetsManager.iconFavoriteSelected
+                        :
+                    AssetsManager.iconFavorite,
+                  color: AppColors.primaryLight,),
+                )
               ],
             ),
           )

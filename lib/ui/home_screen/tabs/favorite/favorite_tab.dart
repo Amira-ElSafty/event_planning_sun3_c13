@@ -1,5 +1,8 @@
+import 'package:event_planning_c13_sun3/providers/event_list_provider.dart';
+import 'package:event_planning_c13_sun3/providers/user_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:provider/provider.dart';
 import '../../../../utils/app_colors.dart';
 import '../../../../utils/app_styles.dart';
 import '../../../../utils/assets_manager.dart';
@@ -13,6 +16,11 @@ class FavoriteTab extends StatelessWidget {
   Widget build(BuildContext context) {
     var height = MediaQuery.of(context).size.height ;
     var width = MediaQuery.of(context).size.width ;
+    var eventListProvider = Provider.of<EventListProvider>(context);
+    var userProvider = Provider.of<UserProvider>(context);
+    if(eventListProvider.favoriteEventList.isEmpty){
+      eventListProvider.getFavoriteEvents(userProvider.currentUser!.id);
+    }
     return SafeArea(
       child: Padding(
         padding:  EdgeInsets.symmetric(
@@ -27,7 +35,12 @@ class FavoriteTab extends StatelessWidget {
               hintText: AppLocalizations.of(context)!.search_event,
             ),
             SizedBox(height: height*0.02,),
-            Expanded(child: ListView.separated(
+            Expanded(child:
+                eventListProvider.favoriteEventList.isEmpty?
+                    Center(child: Text(AppLocalizations.of(context)!.no_favorite_events_found,
+                    style: AppStyles.medium16Black,),)
+                    :
+            ListView.separated(
                 separatorBuilder: (context,index){
                   return SizedBox(
                     height: height*0.02,
@@ -35,10 +48,9 @@ class FavoriteTab extends StatelessWidget {
                 },
               padding: EdgeInsets.zero,
               itemBuilder: (context,index){
-              return Container();
-                // EventItemWidget();
+              return  EventItemWidget(event: eventListProvider.favoriteEventList[index],);
             },
-              itemCount: 20,))
+              itemCount: eventListProvider.favoriteEventList.length,))
           ],
         ),
       ),
